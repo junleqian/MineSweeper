@@ -7,7 +7,14 @@ A set that is required to have:
     O(1) search
 
 Note: Python set() 's "random" pop method
-has a similar implementation in C.
+is "arbitary" instead of random, which means you just
+can't depend on the pop order instead of guaranteeing
+randomness. The "arbitary" behavior isn't what we want
+in this game.
+Try it. If you keep reinstantiating a Python set with
+the same list of items, the pop order is exactly
+the same every time. Therefore, we write our own
+random set class.
 """
 from __future__ import print_function
 from random import randint
