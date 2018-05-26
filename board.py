@@ -85,7 +85,6 @@ class Board(object):
         # don't do [[0]*width]*height, as Python will copy only the references
         # for the internal lists, which cause every row change to to all rows.
         self.board = [ [ BoardGrid(hidden=True, value=0) for _ in xrange(0, width) ] for _ in xrange(0, height) ]
-        self.visited = [ [ False for _ in xrange(0, width) ] for _ in xrange(0, height) ]
 
         self.has_lost = False
 
@@ -153,16 +152,23 @@ class Board(object):
             self.board[row][column].value = 'B'
             self.show_all_mines()
             self.has_lost = True
-        else:
-            self.sweep(row, column)
+            return
+        self.sweep(row, column)
 
     def sweep(self, row, column):
-        self.visited[row][column] = True
+        if self.board[row][column].value == 'M':
+            return
+
         self.board[row][column].hidden = False
-        directions = [(0, 1), (0, -1), (1, 0), (-1, 0), (1, -1), (-1, 1), (1, 0), (-1, 0)]
+
+        if self.board[row][column].value != 0:
+            return
+
+        directions = [(0, 1), (0, -1), (1, 0), (-1, 0) ]
         for direction in directions:
             new_row = row + direction[0]
             new_col = column + direction[1]
             if (new_row >= 0 and new_col >= 0 and new_row < len(self.board) and new_col < len(self.board[0]) and
-                    not self.visited[new_row][new_col] and self.board[new_row][new_col].value == 0):
-                self.sweep(new_row, new_col)
+                    self.board[new_row][new_col].hidden):
+                    self.board[new_row][new_col].hidden = False
+                    self.sweep(new_row, new_col)
