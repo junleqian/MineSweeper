@@ -68,4 +68,21 @@ class Game(object):
                     continue
                 cls.dimension = Dimension(height, width, mines)
         cls.board = Board(cls.dimension.height, cls.dimension.width, cls.dimension.mines)
+        while not cls.board.lost() and not cls.board.win():
+            cls.board.display()
+            coordinate = raw_input("Please enter the row and column for the next sweep, separated by space ('4 3' means row 4, column 3):\n")
+            coordinate = coordinate.split()
+            if len(coordinate) != 2:
+                print("Invalid coordiante input: {}".format(coordinate))
+                continue
+            x, y = int(coordinate[0]) - 1, int(coordinate[1]) - 1
+            if x < 0 or y < 0 or x > cls.dimension.height - 1 or y > cls.dimension.width - 1:
+                print("Invalid coordinate input.")
+                continue
+            print("You 've stepped on grid ({}, {}).".format(x+1, y+1))
+            cls.board.step_on(x, y)
         cls.board.display()
+        if cls.board.lost():
+            print("You 've lost, because you stepped on a mine!")
+        if cls.board.win():
+            print("You 've won!")

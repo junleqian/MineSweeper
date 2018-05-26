@@ -19,6 +19,13 @@ random set class.
 from __future__ import print_function
 from random import randint
 
+
+class BoardGrid(object):
+    def __init__(self, hidden, value):
+        self.hidden = hidden
+        self.value = value
+
+
 class RandomSet(object):
     def __init__(self):
         self.item_set = set()
@@ -70,14 +77,18 @@ class RandomSet(object):
 Class definition of the mine board
 """
 class Board(object):
-    def __init__(self, height, width, NumOfMines):
-        NumOfMines = min(height*width, NumOfMines)
+    def __init__(self, height, width, num_of_mines):
+        num_of_mines = min(height*width, num_of_mines)
 
         # initialize the board with all zeros, reprenting the mine count
         # use 'M' to represent a mine
         # don't do [[0]*width]*height, as Python will copy only the references
         # for the internal lists, which cause every row change to to all rows.
-        self.board = [ [ 0 for _ in xrange(0, width) ] for _ in xrange(0, height) ]
+        self.board = [ [ BoardGrid(hidden=True, value=0) for _ in xrange(0, width) ] for _ in xrange(0, height) ]
+
+        self.has_lost = False
+
+        self.grounds = height * width - num_of_mines
 
         # initialize a random set and add all coordinates into the random set
         # O(N), N is the number of grids on the board
@@ -87,32 +98,62 @@ class Board(object):
                 random_set.add((i, j))
 
         # O(K) if we need K mines
-        while NumOfMines > 0:
+        while num_of_mines > 0:
             # O(1) pop
             i,  j = random_set.pop()
-            self.board[i][j] = 'M'
+            self.board[i][j] = BoardGrid(hidden=True, value='M')
             # increase mine counts surronding the current mine
             directions = [(0, 1), (0, -1), (1, 0), (-1, 0), (1, 1), (-1, -1), (1, -1), (-1, 1)]
             for direction in directions:
                 x, y = i + direction[0], j + direction[1]
-                if x >= 0 and y >= 0 and x < height and y < width and self.board[x][y] != 'M':
+                if x >= 0 and y >= 0 and x < height and y < width and self.board[x][y].value != 'M':
                     # if it is a valid grid and it is not a mine
-                    self.board[x][y] += 1
-            NumOfMines -= 1
+                    self.board[x][y].value += 1
+            num_of_mines -= 1
 
     def __repr__(self):
         result = ""
         for i in xrange(0, len(self.board)):
-            for j in xrange(0, 1+2*len(self.board[0])):
+            max_digits = len(str(len(self.board)))
+            for j in xrange(0, 1+max_digits+4*len(self.board[0])):
                 result += "-"
             result += "\n"
+            result += "{}".format(i+1).zfill(max_digits)
             for j in xrange(0, len(self.board[0])):
-                result += "|{}".format(self.board[i][j])
+                if self.board[i][j].hidden:
+                    grid = " "
+                else:
+                    grid = self.board[i][j].value
+                result += "| {} ".format(grid)
             result += "|\n"
-        for i in xrange(0, 1+2*len(self.board[0])):
+        for i in xrange(0, 1+max_digits+4*len(self.board[0])):
             result += "-"
-        result += "\n"
         return result
+
 
     def display(self):
         print(self)
+
+
+    def win(self):
+        return self.grounds == 0
+
+    def lost(self):
+        return self.has_lost
+
+    def show_all_mines(self):
+        for i in xrange(len(self.board)):
+            for j in xrange(len(self.board[0])):
+                if self.board[i][j].value in set(['M', 'B']):
+                    self.board[i][j].hidden = False
+
+    def step_on(self, row, column):
+        if self.board[row][column].value == 'M':
+            self.board[row][column].value = 'B'
+            self.show_all_mines()
+            self.has_lost = True
+        else:
+            self.sweep(row, column)
+
+    def sweep(self, row, column):
+        pass
