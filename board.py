@@ -164,7 +164,7 @@ class Board(object):
         if self.board[row][column].value != 0:
             return
 
-        directions = [(0, 1), (0, -1), (1, 0), (-1, 0) ]
+        directions = [(0, 1), (0, -1), (1, 0), (-1, 0), (1, 1), (-1, -1), (1, -1), (-1, 1) ]
         for direction in directions:
             new_row = row + direction[0]
             new_col = column + direction[1]
