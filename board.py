@@ -114,11 +114,10 @@ class Board(object):
     def __repr__(self):
         result = ""
         for i in xrange(0, len(self.board)):
-            max_digits = len(str(len(self.board)))
-            for j in xrange(0, 1+max_digits+4*len(self.board[0])):
+            char_length = 1+4*len(self.board[0])
+            for j in xrange(0, char_length):
                 result += "-"
             result += "\n"
-            result += "{}".format(i+1).zfill(max_digits)
             for j in xrange(0, len(self.board[0])):
                 if self.board[i][j].hidden:
                     grid = " "
@@ -126,7 +125,7 @@ class Board(object):
                     grid = self.board[i][j].value
                 result += "| {} ".format(grid)
             result += "|\n"
-        for i in xrange(0, 1+max_digits+4*len(self.board[0])):
+        for i in xrange(0, char_length):
             result += "-"
         return result
 
