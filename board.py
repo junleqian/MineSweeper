@@ -136,7 +136,10 @@ class Board(object):
 
 
     def win(self):
-        return self.grounds == 0
+        if self.grounds == 0:
+            self.show_all_mines()
+            return True
+        return False
 
     def lost(self):
         return self.has_lost
@@ -148,6 +151,8 @@ class Board(object):
                     self.board[i][j].hidden = False
 
     def step_on(self, row, column):
+        if self.board[row][column].hidden == False:
+            return
         if self.board[row][column].value == 'M':
             self.board[row][column].value = 'B'
             self.show_all_mines()
@@ -160,6 +165,7 @@ class Board(object):
             return
 
         self.board[row][column].hidden = False
+        self.grounds -= 1
 
         if self.board[row][column].value != 0:
             return
@@ -170,5 +176,4 @@ class Board(object):
             new_col = column + direction[1]
             if (new_row >= 0 and new_col >= 0 and new_row < len(self.board) and new_col < len(self.board[0]) and
                     self.board[new_row][new_col].hidden):
-                    self.board[new_row][new_col].hidden = False
                     self.sweep(new_row, new_col)

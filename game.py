@@ -85,4 +85,4 @@ class Game(object):
         if cls.board.lost():
             print("You 've lost, because you stepped on a mine!")
         if cls.board.win():
-            print("You 've won!")
+            print("Congratulations, {}! You 've won!".format(cls.name))
